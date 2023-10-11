@@ -15,8 +15,9 @@ public class MoneyTransferTest {
     @BeforeEach
     void shouldTransferMoneyBetweenOwnCardsV1() {
         open("http://localhost:9999");
+
         var loginPage = new LoginPage();
-//    var loginPage = open("http://localhost:9999", LoginPageV1.class);
+        var dashboardPage = new DashboardPage();
         var authInfo = DataHelper.getAuthInfo();
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
