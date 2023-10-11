@@ -15,13 +15,12 @@ public class MoneyTransferTest {
     @BeforeEach
     void shouldTransferMoneyBetweenOwnCardsV1() {
         open("http://localhost:9999");
-
         var loginPage = new LoginPage();
-        var dashboardPage = new DashboardPage();
         var authInfo = DataHelper.getAuthInfo();
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
-        verificationPage.validVerify(verificationCode);
+        dashboardPage = verificationPage.validVerify(verificationCode);
+
     }
     @Test
     void transferMoneyFromFirstToSecondCard(){
@@ -39,7 +38,21 @@ public class MoneyTransferTest {
         Assertions.assertEquals(expectedFirstCardBalance, actualBalanceFirstCard);
         Assertions.assertEquals(expectedSecondCardBalance, actualBalanceSecondCard);
 
-
+    }
+    @Test
+    void shouldGetMessageError(){
+        var firstCardInfo = DataHelper.getFirstCard();
+        var secondCardInfo = DataHelper.getSecondCard();
+        var firstCardBalance = dashboardPage.getCardBalance(firstCardInfo);
+        var secondCardBalance = dashboardPage.getCardBalance(secondCardInfo);
+        var amount = DataHelper.transferInvalidAmount(firstCardBalance);
+        var transferPage = dashboardPage.selectCardToTransfer(secondCardInfo);
+        dashboardPage = transferPage.makeValidTransferPage(String.valueOf(amount), firstCardInfo);
+        transferPage.findErrorMessage("Недостаточно средств на карте для перевода!");
+        var actualBalanceFirstCard = dashboardPage.getCardBalance(firstCardInfo);
+        var actualBalanceSecondCard = dashboardPage.getCardBalance(secondCardInfo);
+        Assertions.assertEquals(firstCardBalance, actualBalanceFirstCard);
+        Assertions.assertEquals(secondCardBalance, actualBalanceSecondCard);
 
     }
 
